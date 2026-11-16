@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -10,6 +11,8 @@ MAX_BYTES = 1_000_000_000     # keep uploads well under 1 GB
 
 
 def probe(path: Path) -> dict:
+    if shutil.which("ffprobe") is None:
+        raise SystemExit("ffprobe is not installed (apt-get install ffmpeg)")
     out = subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
          "stream=width,height:format=duration", "-of", "json", str(path)],
