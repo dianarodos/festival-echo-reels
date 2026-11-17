@@ -24,6 +24,14 @@ LOG = ROOT / "data" / "posted.json"
 CAPTIONS = ROOT / "config" / "captions.json"
 
 
+def note(line: str) -> None:
+    """Append a line to the summary file the workflow turns into a ping (if SUMMARY_FILE is set)."""
+    path = os.environ.get("SUMMARY_FILE")
+    if path:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(line + "\n")
+
+
 def load_log() -> list[dict]:
     return json.loads(LOG.read_text()) if LOG.exists() else []
 
@@ -70,7 +78,8 @@ def main(argv=None) -> int:
         todo = queue(videos, log, os.environ.get("QUEUE_ORDER", "name"))
     print(f"{len(videos)} videos in Drive, {len(todo)} waiting in the queue")
     if not todo:
-        print("Nothing to post: add more videos to the Drive folder."); return 0
+        print("Nothing to post: add more videos to the Drive folder.")
+        note("Nothing to post: the Drive folder has no more usable videos. Add more!"); return 0
 
     posted, failed = 0, False
     with tempfile.TemporaryDirectory() as tmp:
@@ -100,11 +109,13 @@ def main(argv=None) -> int:
                     except graph.PostError as e:
                         print(f"  {v['name']}: Reel posted, but the link comment failed: {e}")
                 print(f"  {v['name']}: posted Reel (id {vid})")
+                note(f"Posted: {v['name']} - https://www.facebook.com/reel/{vid}")
                 posted += 1
             except graph.PostError as e:
                 failed = True
                 entry.update(status="failed", error=str(e))     # not 'skipped': the next run tries it again
                 print(f"  {v['name']}: FAILED: {e}")
+                note(f"FAILED: {v['name']} - {e}")
                 log.append(entry); break
             log.append(entry)
     if not a.dry_run:

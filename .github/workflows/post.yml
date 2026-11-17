@@ -5,7 +5,9 @@ run-name: "Post Reel ${{ github.event.inputs.dry_run == 'true' && '(dry run)' ||
 
 on:
   schedule:
-    - cron: "0 14 * * *"        # 14:00 UTC = 9:00 AM Miami (EST) / 5:00 PM Moscow. Change to taste.
+    # Windows (Miami time, EST). The job starts at the window's opening and waits a random time inside it.
+    - cron: "0 12 * * *"        # morning: 12:00 UTC = 7:00 AM EST, posts between 7:00 and 9:00
+    - cron: "0 23 * * *"        # evening: 23:00 UTC = 6:00 PM EST, posts between 6:00 and 9:00 PM
   workflow_dispatch:
     inputs:
       dry_run:
@@ -23,6 +25,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: post-reel          # never two uploads at once
@@ -31,7 +34,7 @@ concurrency:
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,8 +44,18 @@ jobs:
       - name: Install ffmpeg (for ffprobe)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: pip install -r requirements.txt
+      - name: Wait a random time inside the posting window
+        if: github.event_name == 'schedule'
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          if [ "$SCHEDULE" = "0 12 * * *" ]; then max=120; else max=180; fi   # minutes: 2 h morning, 3 h evening
+          wait=$(( RANDOM % (max * 60) ))
+          echo "Waiting $((wait / 60)) min before posting"
+          sleep "$wait"
       - name: Post Reel
         env:
+          SUMMARY_FILE: ${{ runner.temp }}/summary.txt
           META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
           GCP_SERVICE_ACCOUNT_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
           FB_PAGE_ID: ${{ vars.FB_PAGE_ID }}
@@ -57,6 +70,15 @@ jobs:
           [ -n "$FILE_ID" ] && args="$args --file-id $FILE_ID"
           [ "$FORCE" = "true" ] && args="$args --force"
           python -m reels.run $args
+      - name: Ping me
+        if: always() && github.event.inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY_FILE: ${{ runner.temp }}/summary.txt
+        run: |
+          [ -s "$SUMMARY_FILE" ] || exit 0
+          url=$(gh issue create --repo "$GITHUB_REPOSITORY" --title "$(head -n1 "$SUMMARY_FILE" | cut -c1-120)" --body-file "$SUMMARY_FILE")
+          gh issue close "$url" --repo "$GITHUB_REPOSITORY" || true
       - name: Save the post log
         if: always() && github.event.inputs.dry_run != 'true'
         run: |
