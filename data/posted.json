@@ -19,5 +19,12 @@
   "at": "2026-11-16T20:36+00:00",
   "status": "failed",
   "error": "POST 309322972432570/video_reels: Error validating access token: Session has expired on Thursday, 12-Nov-26 16:00:00 PST. The current time is Monday, 16-Nov-26 12:36:43 PST. -> the Page token expired or was revoked: make a new one and update META_PAGE_TOKEN"
+ },
+ {
+  "drive_id": "1K4_7SnqmznnxaYKsP-qqgIzUfQAT4vyU",
+  "name": "Anons_Sherbina.mov",
+  "at": "2026-11-17T02:16+00:00",
+  "status": "posted",
+  "fb_id": "1000648549764061"
  }
 ]
