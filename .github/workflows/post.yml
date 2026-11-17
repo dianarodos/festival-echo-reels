@@ -4,10 +4,8 @@ name: Post next Reel
 run-name: "Post Reel ${{ github.event.inputs.dry_run == 'true' && '(dry run)' || '' }}"
 
 on:
-  schedule:
-    # Windows (Miami time, EST). The job starts at the window's opening and waits a random time inside it.
-    - cron: "0 12 * * *"        # morning: 12:00 UTC = 7:00 AM EST, posts between 7:00 and 9:00
-    - cron: "0 23 * * *"        # evening: 23:00 UTC = 6:00 PM EST, posts between 6:00 and 9:00 PM
+  push:
+    paths: ["data/trigger.txt"]     # a scheduled Claude task commits this file at the start of each window
   workflow_dispatch:
     inputs:
       dry_run:
@@ -45,13 +43,12 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: pip install -r requirements.txt
       - name: Wait a random time inside the posting window
-        if: github.event_name == 'schedule'
-        env:
-          SCHEDULE: ${{ github.event.schedule }}
+        if: github.event_name == 'push'
         run: |
-          if [ "$SCHEDULE" = "0 12 * * *" ]; then max=120; else max=180; fi   # minutes: 2 h morning, 3 h evening
+          window=$(head -n1 data/trigger.txt | awk '{print $1}')
+          if [ "$window" = "morning" ]; then max=120; else max=180; fi   # minutes: 2 h morning (7-9 AM), 3 h evening (6-9 PM)
           wait=$(( RANDOM % (max * 60) ))
-          echo "Waiting $((wait / 60)) min before posting"
+          echo "Window: $window. Waiting $((wait / 60)) min before posting"
           sleep "$wait"
       - name: Post Reel
         env:
