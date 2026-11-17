@@ -26,5 +26,34 @@
   "at": "2026-11-17T02:16+00:00",
   "status": "posted",
   "fb_id": "1000648549764061"
+ },
+ {
+  "drive_id": "1sTT6ziQ5pB5mDrjoc-m5DiZQbjBE1Ub7",
+  "name": "Anons_Sherbina_Insta.mp4",
+  "at": "2026-11-17T02:39+00:00",
+  "status": "skipped",
+  "reason": "not vertical (768x768; Reels need 9:16)"
+ },
+ {
+  "drive_id": "1kBUUFRvlFt2s8Mt_1R_zBAa5eGQqq-tD",
+  "name": "Anons_Vysotskij.mp4",
+  "at": "2026-11-17T02:39+00:00",
+  "status": "skipped",
+  "reason": "not vertical (768x768; Reels need 9:16)"
+ },
+ {
+  "drive_id": "15VsumaZ2L8bjAMfGDSfsRD9MTfvAW9jk",
+  "name": "Anons_ТанцуютВсе_instagram.mp4",
+  "at": "2026-11-17T02:39+00:00",
+  "status": "skipped",
+  "reason": "not vertical (768x768; Reels need 9:16)"
+ },
+ {
+  "drive_id": "15bl28fFIVETgYVonMrwOgUYpiQfNgm9h",
+  "name": "EchoSouth2026_Reel_FB (1).mp4",
+  "at": "2026-11-17T02:39+00:00",
+  "status": "posted",
+  "fb_id": "2082845932428498",
+  "comment_id": "2082845932428498_1432494829095849"
  }
 ]
