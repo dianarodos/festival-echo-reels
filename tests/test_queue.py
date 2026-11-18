@@ -22,3 +22,12 @@ def test_queue_by_created():
 def test_caption_lookup():
     cfg = {"default": "D", "by_file": {"x": "X"}}
     assert caption_for("x.mp4", cfg) == "X" and caption_for("y.mp4", cfg) == "D"
+
+
+def test_recycle_oldest_posted_first_and_excludes_fresh():
+    from reels.run import recycle_queue
+    log = [{"drive_id": "a", "status": "posted", "at": "2026-01-05"},
+           {"drive_id": "c", "status": "posted", "at": "2026-01-02"},
+           {"drive_id": "b", "status": "skipped", "at": "2026-01-01"}]
+    todo = queue(V, log, "name")          # only b is unhandled... but it was skipped, so todo is []
+    assert [v["id"] for v in recycle_queue(V, log, todo)] == ["c", "a"]

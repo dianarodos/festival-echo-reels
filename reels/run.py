@@ -59,6 +59,16 @@ def queue(videos: list[dict], log: list[dict], order: str) -> list[dict]:
     return sorted(todo, key=key)
 
 
+def recycle_queue(videos: list[dict], log: list[dict], todo: list[dict]) -> list[dict]:
+    """Already-posted videos, least recently posted first: the fallback when nothing new in the queue is usable."""
+    last = {}
+    for e in log:
+        if e.get("status") == "posted":
+            last[e["drive_id"]] = max(last.get(e["drive_id"], ""), e.get("at", ""))
+    fresh = {v["id"] for v in todo}
+    return sorted((v for v in videos if v["id"] in last and v["id"] not in fresh), key=lambda v: last[v["id"]])
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
@@ -76,19 +86,25 @@ def main(argv=None) -> int:
             print(f"file {a.file_id} is not in the Drive folder"); return 1
     else:
         todo = queue(videos, log, os.environ.get("QUEUE_ORDER", "name"))
-    print(f"{len(videos)} videos in Drive, {len(todo)} waiting in the queue")
-    if not todo:
+    recycle = [] if a.file_id else recycle_queue(videos, log, todo)
+    print(f"{len(videos)} videos in Drive, {len(todo)} waiting in the queue, {len(recycle)} to repost if none of those is usable")
+    if not todo and not recycle:
         print("Nothing to post: add more videos to the Drive folder.")
         note("Nothing to post: the Drive folder has no more usable videos. Add more!"); return 0
 
     posted, failed = 0, False
     with tempfile.TemporaryDirectory() as tmp:
-        for v in todo:
+        recycled = {v["id"] for v in recycle}
+        for v in todo + recycle:
             if posted >= a.count:
                 break
+            if v["id"] in recycled and not posted:
+                if v is recycle[0]:
+                    print("No new usable video in the queue: reposting the least recently posted one.")
+                    note("No new usable video in the queue, so an already-posted Reel was reposted. Add more videos to Drive!")
             entry = {"drive_id": v["id"], "name": v["name"], "at": datetime.now(timezone.utc).isoformat(timespec="minutes")}
             already = any(e["drive_id"] == v["id"] and e.get("status") == "posted" for e in log)
-            if already and not a.force:
+            if already and not a.force and v["id"] not in recycled:
                 print(f"  {v['name']}: already posted; skipped"); continue
             path = drive.download(s, v["id"], Path(tmp) / "video.mp4")
             bad = media.problems(media.probe(path), path.stat().st_size)
