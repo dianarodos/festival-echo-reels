@@ -55,5 +55,27 @@
   "status": "posted",
   "fb_id": "2082845932428498",
   "comment_id": "2082845932428498_1432494829095849"
+ },
+ {
+  "drive_id": "1P6NwILk8pRzdI68VDN2C5hxeVimsvxC3",
+  "name": "Interviews_Echo (1).mp4",
+  "at": "2026-11-18T00:43+00:00",
+  "status": "skipped",
+  "reason": "not vertical (1440x1080; Reels need 9:16)"
+ },
+ {
+  "drive_id": "1-C0nSTPHxmYAqwsj9pOt-MThjE6FIqZZ",
+  "name": "Interviews_Echo.mp4",
+  "at": "2026-11-18T00:43+00:00",
+  "status": "skipped",
+  "reason": "not vertical (1440x1080; Reels need 9:16)"
+ },
+ {
+  "drive_id": "1qEid9mJ0Dzuf3Ocu_SlG_b_uMp57CfHT",
+  "name": "Vitlya_Insta_Ad.mp4",
+  "at": "2026-11-18T00:43+00:00",
+  "status": "posted",
+  "fb_id": "1469799725155301",
+  "comment_id": "1469799725155301_1680319430197365"
  }
 ]
