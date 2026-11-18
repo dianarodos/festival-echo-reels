@@ -77,5 +77,12 @@
   "status": "posted",
   "fb_id": "1469799725155301",
   "comment_id": "1469799725155301_1680319430197365"
+ },
+ {
+  "drive_id": "1JG5C7Ga4TDqCalMTzE3VWXiTM2uIU5k4",
+  "name": "Что такое Эхо (1).mp4",
+  "at": "2026-11-18T14:08+00:00",
+  "status": "skipped",
+  "reason": "length 314s (Reels must be 3-90s); not vertical (1280x720; Reels need 9:16)"
  }
 ]
