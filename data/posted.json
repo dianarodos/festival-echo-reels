@@ -84,5 +84,13 @@
   "at": "2026-11-18T14:08+00:00",
   "status": "skipped",
   "reason": "length 314s (Reels must be 3-90s); not vertical (1280x720; Reels need 9:16)"
+ },
+ {
+  "drive_id": "15bl28fFIVETgYVonMrwOgUYpiQfNgm9h",
+  "name": "EchoSouth2026_Reel_FB (1).mp4",
+  "at": "2026-11-19T01:54+00:00",
+  "status": "posted",
+  "fb_id": "4477142629168502",
+  "comment_id": "4477142629168502_2090292028286815"
  }
 ]
