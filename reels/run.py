@@ -22,6 +22,7 @@ from reels import drive, graph, media
 ROOT = Path(__file__).resolve().parent.parent
 LOG = ROOT / "data" / "posted.json"
 CAPTIONS = ROOT / "config" / "captions.json"
+PRIORITY = ROOT / "config" / "queue.json"
 
 
 def note(line: str) -> None:
@@ -51,12 +52,26 @@ def caption_for(name: str, cfg: dict) -> str:
     return by_file.get(name) or by_file.get(stem) or cfg.get("default", "")
 
 
-def queue(videos: list[dict], log: list[dict], order: str) -> list[dict]:
-    """Videos not yet handled (posted or skipped), in posting order."""
+def load_priority() -> list[str]:
+    """Name fragments (case-insensitive) that jump the queue, in the order they should post."""
+    try:
+        return json.loads(PRIORITY.read_text(encoding="utf-8")).get("priority", [])
+    except (OSError, ValueError):
+        return []
+
+
+def queue(videos: list[dict], log: list[dict], order: str, priority: list[str] | None = None) -> list[dict]:
+    """Videos not yet handled (posted or skipped), in posting order. `priority` fragments go first, in that order."""
     done = {e["drive_id"] for e in log if e.get("status") in ("posted", "skipped")}
     todo = [v for v in videos if v["id"] not in done]
     key = (lambda v: v["createdTime"]) if order == "created" else (lambda v: v["name"].lower())
-    return sorted(todo, key=key)
+    pri = [p.lower() for p in (priority or [])]
+
+    def rank(v):
+        n = v["name"].lower()
+        return next((i for i, p in enumerate(pri) if p in n), len(pri))
+
+    return sorted(todo, key=lambda v: (rank(v), key(v)))
 
 
 def recycle_queue(videos: list[dict], log: list[dict], todo: list[dict]) -> list[dict]:
@@ -85,7 +100,7 @@ def main(argv=None) -> int:
         if not todo:
             print(f"file {a.file_id} is not in the Drive folder"); return 1
     else:
-        todo = queue(videos, log, os.environ.get("QUEUE_ORDER", "name"))
+        todo = queue(videos, log, os.environ.get("QUEUE_ORDER", "name"), load_priority())
     recycle = [] if a.file_id else recycle_queue(videos, log, todo)
     print(f"{len(videos)} videos in Drive, {len(todo)} waiting in the queue, {len(recycle)} to repost if none of those is usable")
     if not todo and not recycle:

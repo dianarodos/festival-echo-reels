@@ -31,3 +31,7 @@ def test_recycle_oldest_posted_first_and_excludes_fresh():
            {"drive_id": "b", "status": "skipped", "at": "2026-01-01"}]
     todo = queue(V, log, "name")          # only b is unhandled... but it was skipped, so todo is []
     assert [v["id"] for v in recycle_queue(V, log, todo)] == ["c", "a"]
+
+
+def test_priority_goes_first_then_normal_order():
+    assert [v["id"] for v in queue(V, [], "name", ["c.mp4", "B.mp4"])] == ["c", "a", "b"]
