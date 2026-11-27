@@ -220,5 +220,27 @@
   "status": "posted",
   "fb_id": "2394680954612780",
   "comment_id": "2394680954612780_1076786335413539"
+ },
+ {
+  "drive_id": "1XbEm13XguTuHh1mj9242x33ZULnWEiyM",
+  "name": "Anons_Sparg_final (1).mp4",
+  "at": "2026-11-27T13:54+00:00",
+  "status": "skipped",
+  "reason": "not vertical (768x768; Reels need 9:16)"
+ },
+ {
+  "drive_id": "1Gql26M12iw_6MOS0ir6Bs9zHf98FDb9P",
+  "name": "Anons_Krasavtseva_Final.MOV.mp4",
+  "at": "2026-11-27T13:54+00:00",
+  "status": "skipped",
+  "reason": "not vertical (1280x720; Reels need 9:16)"
+ },
+ {
+  "drive_id": "1qEid9mJ0Dzuf3Ocu_SlG_b_uMp57CfHT",
+  "name": "Vitlya_Insta_Ad.mp4",
+  "at": "2026-11-27T13:55+00:00",
+  "status": "posted",
+  "fb_id": "1841676993645981",
+  "comment_id": "1841676993645981_986833990745053"
  }
 ]
