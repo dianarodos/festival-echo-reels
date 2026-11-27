@@ -35,3 +35,8 @@ def test_recycle_oldest_posted_first_and_excludes_fresh():
 
 def test_priority_goes_first_then_normal_order():
     assert [v["id"] for v in queue(V, [], "name", ["c.mp4", "B.mp4"])] == ["c", "a", "b"]
+
+
+def test_excluded_names_are_dropped():
+    from reels.run import drop_excluded
+    assert [v["id"] for v in drop_excluded(V, ["b.MP4"])] == ["b", "c"]

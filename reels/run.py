@@ -60,6 +60,19 @@ def load_priority() -> list[str]:
         return []
 
 
+def load_exclude() -> list[str]:
+    """Name fragments (case-insensitive) that are paused: never posted from the queue or the repost fallback."""
+    try:
+        return json.loads(PRIORITY.read_text(encoding="utf-8")).get("exclude", [])
+    except (OSError, ValueError):
+        return []
+
+
+def drop_excluded(videos: list[dict], exclude: list[str]) -> list[dict]:
+    ex = [e.lower() for e in exclude]
+    return [v for v in videos if not any(e in v["name"].lower() for e in ex)]
+
+
 def queue(videos: list[dict], log: list[dict], order: str, priority: list[str] | None = None) -> list[dict]:
     """Videos not yet handled (posted or skipped), in posting order. `priority` fragments go first, in that order."""
     done = {e["drive_id"] for e in log if e.get("status") in ("posted", "skipped")}
@@ -95,6 +108,8 @@ def main(argv=None) -> int:
     s = drive.session()
     videos = drive.list_videos(s, os.environ["DRIVE_FOLDER_ID"])
     log, cfg = load_log(), load_captions()
+    if not a.file_id:
+        videos = drop_excluded(videos, load_exclude())
     if a.file_id:
         todo = [v for v in videos if v["id"] == a.file_id]
         if not todo:
